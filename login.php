@@ -11,7 +11,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $user = new User();
     if ($user->login($username, $password)) {
         if ($_SESSION['user']['role'] == 'admin') {
-            header('Location: views/admin_dashboard.php');
+            header('Location: views/index.php');
         } else {
             header('Location: views/index.php');
         }

@@ -27,9 +27,16 @@
             background-color: #444;
         }
 
-        nav ul li {
+        nav ul p li {
             display: inline;
             margin-right: 15px;
+        }
+
+        nav ul p a {
+            color: #fff;
+            text-decoration: none;
+            padding: 5px 10px;
+            display: inline-block;
         }
 
         nav ul li a {
@@ -37,6 +44,10 @@
             text-decoration: none;
             padding: 5px 10px;
             display: inline-block;
+        }
+
+        nav ul p a:hover {
+            background-color: #000FFF;
         }
 
         nav ul li a:hover {
@@ -66,22 +77,15 @@
         }
 
         .film-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
             background-color: #fff;
             padding: 15px;
             margin-bottom: 20px;
             border: 1px solid #ddd;
             border-radius: 5px;
             box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
-        }
-
-        .film-container h3 {
-            margin-top: 0;
-        }
-
-        .film-affiche {
-            max-width: 150px;
-            margin-right: 20px;
-            position: relative;
         }
 
         .film-details {
@@ -95,6 +99,17 @@
 
         .film-details p {
             color: #666;
+            margin-bottom: 10px;
+        }
+
+        .film-affiche {
+            max-width: 150px;
+            margin-left: 20px;
+        }
+
+        .film-affiche img {
+            max-width: 100%;
+            border-radius: 5px;
         }
     </style>
 </head>

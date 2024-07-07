@@ -14,13 +14,13 @@ $xml = simplexml_load_file('../exo2.xml');
 
 // Map des images d'affiches des films
 $film_posters = [
-    'Les Brigades du Tigre' => 'images/harry_potter_1.jpg',
+    'Les Brigades du Tigre' => 'images/Brigades.jpg',
     'Harry Potter à l\'école des sorciers' => 'images/harry_potter_1.jpg',
-    'Harry Potter et la Chambre des Secrets' => 'images/harry_potter_1.jpg',
-    'Harry Potter et le Prisonnier d\'Azkaban' => 'images/harry_potter_1.jpg',
-    'Harry Potter et le Prince de Sang-Mêlé' => 'images/harry_potter_1.jpg',
-    'Harry Potter et les Reliques de la Mort (Partie 1)' => 'images/harry_potter_1.jpg',
-    'Spider-Man' => 'images/harry_potter_1.jpg'
+    'Harry Potter et la Chambre des Secrets' => 'images/harry_potter_2.jpg',
+    'Harry Potter et le Prisonnier d\'Azkaban' => 'images/harry_potter_3.jpg',
+    'Harry Potter et le Prince de Sang-Mêlé' => 'images/harry_potter_4.jpg',
+    'Harry Potter et les Reliques de la Mort (Partie 1)' => 'images/harry_potter_5.jpg',
+    'Spider-Man' => 'images/spiderman.jpg'
 ];
 
 ?>
@@ -35,7 +35,7 @@ $film_posters = [
 <nav>
     <ul>
         <?php if (isset($_SESSION['user']) && $_SESSION['user']['role'] === 'admin'): ?>
-            <li><a href="/Gestion_films/views/manage_films.php">Gérer les films</a></li>
+            <p><a href="/Gestion_films/views/manage_films.php">Gérer les films</a></p>
         <?php endif; ?>
         <?php if (isset($_SESSION['user'])): ?>
             <li><a href="/Gestion_films/index.php">Déconnexion</a></li>
@@ -50,15 +50,22 @@ $film_posters = [
     <ul>
         <?php foreach ($xml->liste_films->film as $film) : ?>
             <div class="film-container">
-            <img src="<?php echo $film_posters[(string)$film->titre]; ?>" alt="Affiche de <?php echo $film->titre; ?>" class="film-affiche">
-                <h3><?php echo $film->titre; ?></h3>
-                <p>Durée: <?php echo $film->duree; ?></p>
-                <p>Genre: <?php echo $film->genre; ?></p>
-                <p>Réalisateur: <?php echo $film->realisateur; ?></p>
-                <p>Année de production: <?php echo $film->annee_production; ?></p>
-                <p>Langue: <?php echo $film->langue; ?></p>
-                <p><?php echo $film->paragraphe; ?></p>
+                <div class="film-details">
+                    <h3><?php echo $film->titre; ?></h3>
+                    <p>Durée: <?php echo $film->duree; ?></p>
+                    <p>Genre: <?php echo $film->genre; ?></p>
+                    <p>Réalisateur: <?php echo $film->realisateur; ?></p>
+                    <p>Année de production: <?php echo $film->annee_production; ?></p>
+                    <p>Langue: <?php echo $film->langue; ?></p>
+                    <p><?php echo $film->paragraphe; ?></p>
                 </div>
+                <div class="film-affiche">
+                    <?php
+                    $poster_path = isset($film_posters[(string)$film->titre]) ? $film_posters[(string)$film->titre] : 'images/default_poster.jpg';
+                    ?>
+                    <img src="<?php echo $poster_path; ?>" alt="Affiche de <?php echo $film->titre; ?>">
+                </div>
+            </div>
         <?php endforeach; ?>
     </ul>
 </div>

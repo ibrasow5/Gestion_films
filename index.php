@@ -10,12 +10,44 @@ include_once 'views/header.php';
 <head>
     <meta charset="UTF-8">
     <title>Accueil</title>
-    <link rel="stylesheet" href="assets/css/styles.css">
+    <style>
+        .container {
+            width: 80%;
+            margin: 20px auto;
+            padding: 20px;
+            background-color: #fff;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+
+        .container h1 {
+            color: #333;
+        }
+
+        .container p {
+            color: #666;
+        }
+
+        .container a {
+            display: inline-block;
+            margin: 10px;
+            padding: 10px 20px;
+            color: #fff;
+            background-color: #007bff;
+            text-decoration: none;
+            border-radius: 5px;
+        }
+
+        .container a:hover {
+            background-color: #0056b3;
+        }
+    </style>
 </head>
-<div class="container">
-    <h1>Bienvenue sur le portail cinéma</h1>
-    <p><a href="login.php">Se connecter</a> ou <a href="register.php">S'inscrire</a></p>
-</div>
+<body>
+    <div class="container">
+        <h1>Bienvenue sur le portail cinéma</h1>
+        <p><a href="login.php">Se connecter</a> ou <a href="register.php">S'inscrire</a></p>
+    </div>
 </body>
 </html>
 
