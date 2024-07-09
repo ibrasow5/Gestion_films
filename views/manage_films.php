@@ -14,7 +14,11 @@ $xml = simplexml_load_file('../exo2.xml');
 
 // Ajouter un film
 if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['add_film'])) {
+    $dom = dom_import_simplexml($xml)->ownerDocument;
+    $dom->formatOutput = true;
+
     $newFilm = $xml->liste_films->addChild('film');
+    $newFilm->addAttribute('id', uniqid());
     $newFilm->addChild('titre', $_POST['titre']);
     $newFilm->addChild('duree', $_POST['duree']);
     $newFilm->addChild('genre', $_POST['genre']);
@@ -22,7 +26,9 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['add_film'])) {
     $newFilm->addChild('annee_production', $_POST['annee_production']);
     $newFilm->addChild('langue', $_POST['langue']);
     $newFilm->addChild('paragraphe', $_POST['paragraphe']);
-    $xml->asXML('../exo2.xml');
+
+    // Enregistrer le fichier XML avec un formatage lisible
+    $dom->save('../exo2.xml');
 }
 
 // Modifier un film
@@ -36,7 +42,10 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['edit_film'])) {
             $film->annee_production = $_POST['annee_production'];
             $film->langue = $_POST['langue'];
             $film->paragraphe = $_POST['paragraphe'];
-            $xml->asXML('../exo2.xml');
+
+            $dom = dom_import_simplexml($xml)->ownerDocument;
+            $dom->formatOutput = true;
+            $dom->save('../exo2.xml');
             break;
         }
     }
@@ -48,13 +57,18 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['delete_film'])) {
     foreach ($xml->liste_films->film as $film) {
         if ($film['id'] == $_POST['film_id']) {
             unset($xml->liste_films->film[$filmIndex]);
-            $xml->asXML('../exo2.xml');
+
+            $dom = dom_import_simplexml($xml)->ownerDocument;
+            $dom->formatOutput = true;
+            $dom->save('../exo2.xml');
             break;
         }
         $filmIndex++;
     }
 }
 ?>
+
+
 <!DOCTYPE html>
 <html lang="fr">
 <head>
@@ -187,10 +201,13 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['delete_film'])) {
                     <td><?php echo $film->langue; ?></td>
                     <td><?php echo $film->paragraphe; ?></td>
                     <td>
+                        <!-- Formulaire pour modifier un film -->
                         <form method="post" action="" style="display:inline;">
+                            <input type="hidden" name="edit_film" value="1">
                             <input type="hidden" name="film_id" value="<?php echo $film['id']; ?>">
-                            <button type="submit" name="edit_film">Modifier</button>
+                            <button type="submit">Modifier</button>
                         </form>
+                        <!-- Formulaire pour supprimer un film -->
                         <form method="post" action="" style="display:inline;">
                             <input type="hidden" name="film_id" value="<?php echo $film['id']; ?>">
                             <button type="submit" name="delete_film">Supprimer</button>
