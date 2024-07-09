@@ -202,8 +202,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['delete_film'])) {
                     <td><?php echo $film->paragraphe; ?></td>
                     <td>
                         <!-- Formulaire pour modifier un film -->
-                        <form method="post" action="" style="display:inline;">
-                            <input type="hidden" name="edit_film" value="1">
+                        <form method="post" action="update_film.php" style="display:inline;">
                             <input type="hidden" name="film_id" value="<?php echo $film['id']; ?>">
                             <button type="submit">Modifier</button>
                         </form>
