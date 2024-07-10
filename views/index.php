@@ -32,13 +32,19 @@ $xml = simplexml_load_file('../exo2.xml');
             margin-top: 0;
         }
         .film-affiche {
-            flex: 0 0 150px; /* Définition de la largeur fixe pour l'affiche */
+            flex: 0 0 150px; 
         }
         .film-affiche img {
-            max-width: 100%; /* Assure que l'image s'adapte à la largeur de son conteneur */
-            height: auto; /* Garde les proportions de l'image */
-            display: block; /* Supprime l'espace blanc sous les images */
-            margin-bottom: 10px; /* Espace en bas de chaque affiche */
+            max-width: 100%; 
+            height: auto;
+            display: block; 
+            margin-bottom: 10px; 
+        }
+        .film-details p {
+            color: #000;
+        }
+        .film-details h4 {
+            margin-bottom: 5px;
         }
     </style>
 </head>
@@ -63,12 +69,24 @@ $xml = simplexml_load_file('../exo2.xml');
             <div class="film-container">
                 <div class="film-details">
                     <h3><?php echo $film->titre; ?></h3>
-                    <p>Durée: <?php echo $film->duree; ?></p>
-                    <p>Genre: <?php echo $film->genre; ?></p>
-                    <p>Réalisateur: <?php echo $film->realisateur; ?></p>
-                    <p>Année de production: <?php echo $film->annee_production; ?></p>
-                    <p>Langue: <?php echo $film->langue; ?></p>
-                    <p><?php echo $film->paragraphe; ?></p>
+                    <p><strong>Durée:</strong> <?php echo $film->duree; ?></p>
+                    <p><strong>Genre:</strong> <?php echo $film->genre; ?></p>
+                    <p><strong>Réalisateur:</strong> <?php echo $film->realisateur; ?></p>
+                    <p><strong>Année de production:</strong> <?php echo $film->annee_production; ?></p>
+                    <p><strong>Langue:</strong> <?php echo $film->langue; ?></p>
+                    <p><strong>Description:</strong> <?php echo $film->paragraphe; ?></p>
+                    <h4>Acteurs:</h4>
+                    <ul>
+                        <?php foreach ($film->acteurs->acteur as $acteur) : ?>
+                            <li><?php echo $acteur->prenom . ' ' . $acteur->nom; ?></li>
+                        <?php endforeach; ?>
+                    </ul>
+                    <h4>Horaires:</h4>
+                    <ul>
+                        <?php foreach ($film->liste_horaires->horaires as $horaire) : ?>
+                            <li><strong><?php echo $horaire->jour; ?>:</strong> <?php echo $horaire->heure; ?></li>
+                        <?php endforeach; ?>
+                    </ul>
                 </div>
                 <div class="film-affiche">
                     <?php if (isset($film->affiche) && !empty($film->affiche)) : ?>
