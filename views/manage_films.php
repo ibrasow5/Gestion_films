@@ -35,6 +35,34 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['add_film'])) {
         $newFilm->addChild('affiche', $_FILES['affiche']['name']);
     }
 
+    // Gestion des acteurs
+    $acteursNode = $newFilm->addChild('acteurs');
+    foreach ($_POST['acteurs'] as $acteur) {
+        $acteurNode = $acteursNode->addChild('acteur');
+        list($nom, $prenom) = explode(" ", trim($acteur));
+        $acteurNode->addChild('nom', $nom);
+        $acteurNode->addChild('prenom', $prenom);
+    }
+
+    // Gestion des horaires
+    $horairesNode = $newFilm->addChild('liste_horaires');
+    foreach ($_POST['horaires'] as $jour => $horaires) {
+        $horairesNodeJour = $horairesNode->addChild('horaires');
+        $horairesNodeJour->addChild('jour', $jour);
+
+        // Construire la chaîne d'horaires avec heures et minutes séparées par "|"
+        $horaireString = '';
+        foreach ($horaires as $horaire) {
+            $horaireString .= $horaire['heure'] . ':' . $horaire['minute'] . '|';
+        }
+        // Retirer le dernier "|" s'il y en a un
+        $horaireString = rtrim($horaireString, '|');
+
+        // Ajouter la chaîne complète d'horaires dans le XML
+        $horairesNodeJour->addChild('heure', $horaireString);
+    }
+
+
     // Enregistrer le fichier XML avec un formatage lisible
     $dom->save('../exo2.xml');
 
@@ -44,7 +72,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['add_film'])) {
 }
 
 // Modifier un film
-if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['edit_film'])) {
+if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['update_film'])) {
     foreach ($xml->liste_films->film as $film) {
         if ($film['id'] == $_POST['film_id']) {
             $film->titre = $_POST['titre'];
@@ -195,12 +223,45 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['delete_film'])) {
             <input type="text" id="langue" name="langue" required>
             <label for="paragraphe">Description:</label>
             <textarea id="paragraphe" name="paragraphe" required></textarea>
-            <label for="affiche">Affiche:</label>
-            <input type="file" id="affiche" name="affiche">
-            <button type="submit">Ajouter</button>
+            <label for="acteurs">Acteurs:</label>
+            <div id="acteurs-container">
+                <div class="acteur-input">
+                    <input type="text" name="acteurs[]" required>
+                </div>
+            </div>
+            <button type="button" onclick="ajouterActeur()">Ajouter un acteur</button>
+
+            <label for="horaires">Horaires:</label>
+            <div id="horaires-container">
+                <?php $jours = ['Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi', 'Dimanche']; ?>
+                <?php foreach ($jours as $jour) : ?>
+                    <label><?php echo $jour; ?>:</label><br>
+                    <?php for ($i = 0; $i < 3; $i++) : ?>
+                        <select name="horaires[<?php echo $jour; ?>][<?php echo $i; ?>][heure]">
+                            <?php for ($h = 0; $h <= 23; $h++) : ?>
+                                <option value="<?php echo sprintf("%02d", $h); ?>"><?php echo sprintf("%02d", $h); ?></option>
+                            <?php endfor; ?>
+                        </select>
+                        :
+                        <select name="horaires[<?php echo $jour; ?>][<?php echo $i; ?>][minute]">
+                            <?php for ($m = 0; $m <= 59; $m += 1) : ?>
+                                <option value="<?php echo sprintf("%02d", $m); ?>"><?php echo sprintf("%02d", $m); ?></option>
+                            <?php endfor; ?>
+                        </select>
+                        <br>
+                    <?php endfor; ?>
+                <?php endforeach; ?>
+            </div>
+
+            <label for="affiche">Affiche du film:</label>
+            <input type="file" id="affiche" name="affiche" accept="image/*" required>
+            <br>
+            <button type="submit">Ajouter le film</button>
         </form>
 
-        <h3>Films existants</h3>
+        
+    </div>
+    <h3>Films existants</h3>
         <table>
             <tr>
                 <th>Titre</th>
@@ -210,6 +271,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['delete_film'])) {
                 <th>Année</th>
                 <th>Langue</th>
                 <th>Description</th>
+                <th>Acteurs</th>
+                <th>Horaires</th>
                 <th>Affiche</th>
                 <th>Actions</th>
             </tr>
@@ -221,7 +284,21 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['delete_film'])) {
                     <td><?php echo $film->realisateur; ?></td>
                     <td><?php echo $film->annee_production; ?></td>
                     <td><?php echo $film->langue; ?></td>
-                    <td><?php echo $film->paragraphe; ?></td>
+                    <td style="max-width: 150px; max-height: 200px;"><?php echo $film->paragraphe; ?></td>
+                    <td style="max-width: 150px; max-height: 200px;">
+                        <?php foreach ($film->acteurs->acteur as $acteur) {
+                            echo $acteur->nom . ' ' . $acteur->prenom . '<br>';
+                        } ?>
+                    </td>
+                    <td style="max-width: 150px; max-height: 200px;">
+                        <?php foreach ($film->liste_horaires->horaires as $horaire) {
+                            echo $horaire->jour . ': ';
+                            foreach ($horaire->heure as $index => $heure) {
+                                echo $heure . ':' . $horaire->minute[$index] . ' ';
+                            }
+                            echo '<br>';
+                        } ?>
+                    </td>
                     <td style="max-width: 150px; max-height: 200px;">
                         <?php if (isset($film->affiche) && !empty($film->affiche)) : ?>
                             <img src="../views/images/<?php echo $film->affiche; ?>" alt="Affiche" style="width: 100%; height: auto;">
@@ -241,6 +318,15 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['delete_film'])) {
                 </tr>
             <?php endforeach; ?>
         </table>
-    </div>
+
+        <script>
+        function ajouterActeur() {
+            var container = document.getElementById('acteurs-container');
+            var newInput = document.createElement('div');
+            newInput.className = 'acteur-input';
+            newInput.innerHTML = '<input type="text" name="acteurs[]" required>';
+            container.appendChild(newInput);
+        }
+    </script>
 </body>
 </html>
