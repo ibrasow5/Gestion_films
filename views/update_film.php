@@ -46,7 +46,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['update_film'])) {
             }
         }
 
-        // Enregistrer les modifications dans le fichier XML
         $xml->asXML('../exo2.xml');
 
         // Rediriger vers la page de gestion des films
