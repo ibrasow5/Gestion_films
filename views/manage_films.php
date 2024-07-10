@@ -27,8 +27,20 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['add_film'])) {
     $newFilm->addChild('langue', $_POST['langue']);
     $newFilm->addChild('paragraphe', $_POST['paragraphe']);
 
+    // Gestion de l'affiche du film
+    if ($_FILES['affiche']['error'] === UPLOAD_ERR_OK) {
+        $uploadDir = '../views/images/';
+        $uploadFile = $uploadDir . basename($_FILES['affiche']['name']);
+        move_uploaded_file($_FILES['affiche']['tmp_name'], $uploadFile);
+        $newFilm->addChild('affiche', $_FILES['affiche']['name']);
+    }
+
     // Enregistrer le fichier XML avec un formatage lisible
     $dom->save('../exo2.xml');
+
+    // Rediriger vers la page de gestion après l'ajout
+    header('Location: manage_films.php');
+    exit();
 }
 
 // Modifier un film
@@ -49,6 +61,10 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['edit_film'])) {
             break;
         }
     }
+
+    // Rediriger vers la page de gestion après la modification
+    header('Location: manage_films.php');
+    exit();
 }
 
 // Supprimer un film
@@ -65,6 +81,10 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['delete_film'])) {
         }
         $filmIndex++;
     }
+
+    // Rediriger vers la page de gestion après la suppression
+    header('Location: manage_films.php');
+    exit();
 }
 ?>
 
@@ -160,7 +180,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['delete_film'])) {
     <div class="container">
         <h2>Gérer les films</h2>
         <h3>Ajouter un film</h3>
-        <form method="post" action="">
+        <form method="post" action="" enctype="multipart/form-data">
             <input type="hidden" name="add_film" value="1">
             <label for="titre">Titre:</label>
             <input type="text" id="titre" name="titre" required>
@@ -176,6 +196,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['delete_film'])) {
             <input type="text" id="langue" name="langue" required>
             <label for="paragraphe">Description:</label>
             <textarea id="paragraphe" name="paragraphe" required></textarea>
+            <label for="affiche">Affiche:</label>
+            <input type="file" id="affiche" name="affiche">
             <button type="submit">Ajouter</button>
         </form>
 
@@ -189,7 +211,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['delete_film'])) {
                 <th>Année</th>
                 <th>Langue</th>
                 <th>Description</th>
-                <th>Actions</th>
+                <th>Affiche</th>
+                <th>Actions</th>>
             </tr>
             <?php foreach ($xml->liste_films->film as $film) : ?>
                 <tr>
@@ -200,6 +223,14 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['delete_film'])) {
                     <td><?php echo $film->annee_production; ?></td>
                     <td><?php echo $film->langue; ?></td>
                     <td><?php echo $film->paragraphe; ?></td>
+                    <td style="max-width: 150px; max-height: 200px;">
+                        <?php if (isset($film->affiche) && !empty($film->affiche)) : ?>
+                            <img src="../views/images/<?php echo $film->affiche; ?>" style="max-width: 100%; max-height: 100%;" alt="Affiche du film">
+                        <?php else : ?>
+                            <p>Aucune affiche disponible</p>
+                        <?php endif; ?>
+                    </td>
+
                     <td>
                         <!-- Formulaire pour modifier un film -->
                         <form method="post" action="update_film.php" style="display:inline;">

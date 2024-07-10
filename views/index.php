@@ -12,17 +12,6 @@ if (!isset($_SESSION['user'])) {
 // Charger et afficher les films depuis le fichier XML
 $xml = simplexml_load_file('../exo2.xml');
 
-// Map des images d'affiches des films
-$film_posters = [
-    'Les Brigades du Tigre' => 'images/Brigades.jpg',
-    'Harry Potter à l\'école des sorciers' => 'images/harry_potter_1.jpg',
-    'Harry Potter et la Chambre des Secrets' => 'images/harry_potter_2.jpg',
-    'Harry Potter et le Prisonnier d\'Azkaban' => 'images/harry_potter_3.jpg',
-    'Harry Potter et le Prince de Sang-Mêlé' => 'images/harry_potter_4.jpg',
-    'Harry Potter et les Reliques de la Mort (Partie 1)' => 'images/harry_potter_5.jpg',
-    'Spider-Man' => 'images/spiderman.jpg'
-];
-
 ?>
 <!DOCTYPE html>
 <html lang="fr">
@@ -30,6 +19,28 @@ $film_posters = [
     <meta charset="UTF-8">
     <title>Portail Cinéma</title>
     <link rel="stylesheet" href="assets/css/styles.css">
+    <style>
+        .film-container {
+            display: flex;
+            margin-bottom: 20px;
+        }
+        .film-details {
+            flex: 1;
+            padding-right: 20px;
+        }
+        .film-details h3 {
+            margin-top: 0;
+        }
+        .film-affiche {
+            flex: 0 0 150px; /* Définition de la largeur fixe pour l'affiche */
+        }
+        .film-affiche img {
+            max-width: 100%; /* Assure que l'image s'adapte à la largeur de son conteneur */
+            height: auto; /* Garde les proportions de l'image */
+            display: block; /* Supprime l'espace blanc sous les images */
+            margin-bottom: 10px; /* Espace en bas de chaque affiche */
+        }
+    </style>
 </head>
 <body>
 <nav>
@@ -47,7 +58,7 @@ $film_posters = [
 </nav>
 <div class="container">
     <h2>Films disponibles</h2>
-    <ul>
+    <?php if (count($xml->liste_films->film) > 0) : ?>
         <?php foreach ($xml->liste_films->film as $film) : ?>
             <div class="film-container">
                 <div class="film-details">
@@ -60,14 +71,17 @@ $film_posters = [
                     <p><?php echo $film->paragraphe; ?></p>
                 </div>
                 <div class="film-affiche">
-                    <?php
-                    $poster_path = isset($film_posters[(string)$film->titre]) ? $film_posters[(string)$film->titre] : 'images/default_poster.jpg';
-                    ?>
-                    <img src="<?php echo $poster_path; ?>" alt="Affiche de <?php echo $film->titre; ?>">
+                    <?php if (isset($film->affiche) && !empty($film->affiche)) : ?>
+                        <img src="../views/images/<?php echo $film->affiche; ?>" alt="Affiche de <?php echo $film->titre; ?>">
+                    <?php else : ?>
+                        <p>Aucune affiche disponible</p>
+                    <?php endif; ?>
                 </div>
             </div>
         <?php endforeach; ?>
-    </ul>
+    <?php else : ?>
+        <p>Aucun film trouvé.</p>
+    <?php endif; ?>
 </div>
 </body>
 </html>

@@ -11,39 +11,53 @@ if (!isset($_SESSION['user']) || $_SESSION['user']['role'] != 'admin') {
 
 // Charger le fichier XML
 $xml = simplexml_load_file('../exo2.xml');
+if (!$xml) {
+    die('Erreur lors du chargement du fichier XML.');
+}
 
-// Trouver le film à modifier
+// Trouver le film à modifier par ID
 $filmToEdit = null;
 if (isset($_POST['film_id'])) {
-    foreach ($xml->liste_films->film as $film) {
-        if ($film['id'] == $_POST['film_id']) {
-            $filmToEdit = $film;
-            break;
-        }
-    }
+    $film_id = $_POST['film_id'];
+    $filmToEdit = $xml->xpath("//film[@id='$film_id']")[0];
 }
 
 // Si le formulaire de modification est soumis
 if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['update_film'])) {
-    foreach ($xml->liste_films->film as $film) {
-        if ($film['id'] == $_POST['film_id']) {
-            $film->titre = $_POST['titre'];
-            $film->duree = $_POST['duree'];
-            $film->genre = $_POST['genre'];
-            $film->realisateur = $_POST['realisateur'];
-            $film->annee_production = $_POST['annee_production'];
-            $film->langue = $_POST['langue'];
-            $film->paragraphe = $_POST['paragraphe'];
+    // Vérifier si le film à modifier a été trouvé
+    if ($filmToEdit) {
+        // Mettre à jour les données du film
+        $filmToEdit->titre = $_POST['titre'];
+        $filmToEdit->duree = $_POST['duree'];
+        $filmToEdit->genre = $_POST['genre'];
+        $filmToEdit->realisateur = $_POST['realisateur'];
+        $filmToEdit->annee_production = $_POST['annee_production'];
+        $filmToEdit->langue = $_POST['langue'];
+        $filmToEdit->paragraphe = $_POST['paragraphe'];
 
-            $dom = dom_import_simplexml($xml)->ownerDocument;
-            $dom->formatOutput = true;
-            $dom->save('../exo2.xml');
-            header('Location: manage_films.php');
-            exit();
+        // Vérifier et traiter l'upload de l'affiche
+        if ($_FILES['affiche']['error'] === UPLOAD_ERR_OK) {
+            $uploadDir = '../views/images/';
+            $uploadFile = $uploadDir . basename($_FILES['affiche']['name']);
+            if (move_uploaded_file($_FILES['affiche']['tmp_name'], $uploadFile)) {
+                $filmToEdit->affiche = '' . basename($_FILES['affiche']['name']);
+            } else {
+                echo "Erreur lors de l'upload du fichier.";
+            }
         }
+
+        // Enregistrer les modifications dans le fichier XML
+        $xml->asXML('../exo2.xml');
+
+        // Rediriger vers la page de gestion des films
+        header('Location: manage_films.php');
+        exit();
+    } else {
+        echo "Film non trouvé.";
     }
 }
 ?>
+
 <!DOCTYPE html>
 <html lang="fr">
 <head>
@@ -82,6 +96,10 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['update_film'])) {
             border-radius: 4px;
         }
 
+        input[type="file"] {
+            margin-top: 10px;
+        }
+
         button {
             padding: 10px 15px;
             background-color: #007bff;
@@ -102,7 +120,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['update_film'])) {
     <div class="container">
         <h2>Modifier un film</h2>
         <?php if ($filmToEdit) : ?>
-            <form method="post" action="">
+            <form method="post" action="" enctype="multipart/form-data">
                 <input type="hidden" name="film_id" value="<?php echo $filmToEdit['id']; ?>">
                 <input type="hidden" name="update_film" value="1">
                 <label for="titre">Titre:</label>
@@ -119,6 +137,11 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['update_film'])) {
                 <input type="text" id="langue" name="langue" value="<?php echo $filmToEdit->langue; ?>" required>
                 <label for="paragraphe">Description:</label>
                 <textarea id="paragraphe" name="paragraphe" rows="4" required><?php echo $filmToEdit->paragraphe; ?></textarea>
+                <label for="affiche">Affiche:</label>
+                <input type="file" id="affiche" name="affiche">
+                <?php if ($filmToEdit->affiche) : ?>
+                    <img src="<?php echo $filmToEdit->affiche; ?>" alt="Affiche du film">
+                <?php endif; ?>
                 <button type="submit">Mettre à jour</button>
             </form>
         <?php else : ?>
