@@ -88,7 +88,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['delete_film'])) {
 }
 ?>
 
-
 <!DOCTYPE html>
 <html lang="fr">
 <head>
@@ -134,7 +133,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['delete_film'])) {
             border: none;
             border-radius: 4px;
             cursor: pointer;
-            width: 100px; 
+            width: 100px;
             text-align: center;
         }
 
@@ -212,7 +211,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['delete_film'])) {
                 <th>Langue</th>
                 <th>Description</th>
                 <th>Affiche</th>
-                <th>Actions</th>>
+                <th>Actions</th>
             </tr>
             <?php foreach ($xml->liste_films->film as $film) : ?>
                 <tr>
@@ -225,22 +224,18 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['delete_film'])) {
                     <td><?php echo $film->paragraphe; ?></td>
                     <td style="max-width: 150px; max-height: 200px;">
                         <?php if (isset($film->affiche) && !empty($film->affiche)) : ?>
-                            <img src="../views/images/<?php echo $film->affiche; ?>" style="max-width: 100%; max-height: 100%;" alt="Affiche du film">
-                        <?php else : ?>
-                            <p>Aucune affiche disponible</p>
+                            <img src="../views/images/<?php echo $film->affiche; ?>" alt="Affiche" style="width: 100%; height: auto;">
                         <?php endif; ?>
                     </td>
-
                     <td>
-                        <!-- Formulaire pour modifier un film -->
-                        <form method="post" action="update_film.php" style="display:inline;">
+                        <form method="post" action="">
+                            <input type="hidden" name="delete_film" value="1">
+                            <input type="hidden" name="film_id" value="<?php echo $film['id']; ?>">
+                            <button type="submit">Supprimer</button>
+                        </form>
+                        <form method="post" action="update_film.php">
                             <input type="hidden" name="film_id" value="<?php echo $film['id']; ?>">
                             <button type="submit">Modifier</button>
-                        </form>
-                        <!-- Formulaire pour supprimer un film -->
-                        <form method="post" action="" style="display:inline;">
-                            <input type="hidden" name="film_id" value="<?php echo $film['id']; ?>">
-                            <button type="submit" name="delete_film">Supprimer</button>
                         </form>
                     </td>
                 </tr>
