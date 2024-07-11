@@ -217,6 +217,15 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['delete_film'])) {
             <input type="text" id="genre" name="genre" required>
             <label for="realisateur">Réalisateur:</label>
             <input type="text" id="realisateur" name="realisateur" required>
+            <label for="acteurs">Acteurs:</label>
+            
+            <div id="acteurs-container">
+                <div class="acteur-input">
+                    <input type="text" name="acteurs[]" required>
+                </div>
+            </div>
+            
+            <button type="button" onclick="ajouterActeur()">Ajouter un acteur</button>
             <label for="annee_production">Année de production:</label>
             <input type="text" id="annee_production" name="annee_production" required>
             <label for="langue">Langue:</label>
@@ -224,13 +233,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['delete_film'])) {
             <label for="paragraphe">Description:</label>
             <textarea id="paragraphe" name="paragraphe" required></textarea>
             <label for="acteurs">Acteurs:</label>
-            <div id="acteurs-container">
-                <div class="acteur-input">
-                    <input type="text" name="acteurs[]" required>
-                </div>
-            </div>
-            <button type="button" onclick="ajouterActeur()">Ajouter un acteur</button>
-
+        
             <label for="horaires">Horaires:</label>
             <div id="horaires-container">
                 <?php $jours = ['Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi', 'Dimanche']; ?>
